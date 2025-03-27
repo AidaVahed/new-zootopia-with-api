@@ -7,38 +7,46 @@ def load_data(file_path):
         return json.load(handle)
 
 
-with open('animals_template.html', 'r') as template_file:
-    """Reads the HTML template file."""
-    html_template = template_file.read()
+def serialize_animal(animal_obj):
+    """Serializes a single animal object to an HTML string."""
+    output = '<li class="cards__item">\n'
 
-animals_data = load_data('animals_data.json')
+    if 'name' in animal_obj:
+        output += f'<div class="card__title">{animal_obj["name"]}</div>\n'
 
-output = ''
+    output += '<p class="card__text">\n'
 
-for animal in animals_data:
-    animal_info = '<li class="cards__item">'
+    if 'characteristics' in animal_obj and 'diet' in animal_obj['characteristics']:
+        output += f'<strong>Diet:</strong> {animal_obj["characteristics"]["diet"]}<br/>\n'
 
-    if 'name' in animal:
-        animal_info += f'<div class="card__title">{animal["name"]}</div>\n'
+    if 'locations' in animal_obj and len(animal_obj['locations']) > 0:
+        output += f'<strong>Location:</strong> {animal_obj["locations"][0]}<br/>\n'
 
-    animal_info += '<p class="card__text">\n'
+    if 'taxonomy' in animal_obj and 'order' in animal_obj['taxonomy']:
+        output += f'<strong>Type:</strong> {animal_obj["taxonomy"]["order"]}<br/>\n'
 
-    if 'characteristics' in animal and 'diet' in animal['characteristics']:
-        animal_info += f'<strong>Diet:</strong> {animal["characteristics"]["diet"]}<br/>\n'
+    output += '</p>\n</li>'
+    return output
 
-    if 'locations' in animal and len(animal['locations']) > 0:
-        animal_info += f'<strong>Location:</strong> {animal["locations"][0]}<br/>\n'
 
-    if 'taxonomy' in animal and 'order' in animal['taxonomy']:
-        animal_info += f'<strong>Type:</strong> {animal["taxonomy"]["order"]}<br/>\n'
+def main():
+    """Main function to read data, generate HTML and write to file."""
+    with open('animals_template.html', 'r') as template_file:
+        html_template = template_file.read()
 
-    animal_info += '</p>\n</li>'
-    output += animal_info
+    animals_data = load_data('animals_data.json')
 
-final_html = html_template.replace('__REPLACE_ANIMALS_INFO__', output)
+    output = ''
+    for animal in animals_data:
+        output += serialize_animal(animal)
 
-with open('animals.html', 'w') as html_file:
-    """Writes the generated HTML content to a new file."""
-    html_file.write(final_html)
+    final_html = html_template.replace('__REPLACE_ANIMALS_INFO__', output)
 
-print("HTML file generated successfully: animals.html")
+    with open('animals.html', 'w') as html_file:
+        html_file.write(final_html)
+
+    print("HTML file generated successfully: animals.html")
+
+
+if __name__ == "__main__":
+    main()
