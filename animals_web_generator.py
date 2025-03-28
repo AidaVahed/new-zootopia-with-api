@@ -1,11 +1,4 @@
-import json
-
-
-def load_data(file_path):
-    """Loads a JSON file from the given file path."""
-    with open(file_path, "r") as handle:
-        return json.load(handle)
-
+import data_fetcher
 
 def serialize_animal(animal_obj):
     """Serializes a single animal object to an HTML string."""
@@ -28,13 +21,17 @@ def serialize_animal(animal_obj):
     output += '</p>\n</li>'
     return output
 
-
 def main():
-    """Main function to read data, generate HTML and write to file."""
+    """Main function to fetch data, generate HTML and write to file."""
+    animal_name = input("Please enter an animal: ")
+    animals_data = data_fetcher.fetch_data(animal_name)
+
+    if not animals_data:
+        print(f"No data found for the animal '{animal_name}'.")
+        return
+
     with open('animals_template.html', 'r') as template_file:
         html_template = template_file.read()
-
-    animals_data = load_data('animals_data.json')
 
     output = ''
     for animal in animals_data:
@@ -46,7 +43,6 @@ def main():
         html_file.write(final_html)
 
     print("HTML file generated successfully: animals.html")
-
 
 if __name__ == "__main__":
     main()
